@@ -7,6 +7,10 @@
   <title>Check-up Gratuito do Rebanho | Agropec Brasil</title>
 
   <meta name="theme-color" content="#0e3b27" />
+  <meta name="color-scheme" content="light" />
+  <link rel="preconnect" href="https://www.googletagmanager.com" />
+  <link rel="preconnect" href="https://connect.facebook.net" />
+  <link rel="dns-prefetch" href="https://script.google.com" />
   <meta name="robots" content="index,follow" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="pt_BR" />
@@ -73,6 +77,7 @@
 </head>
 
 <body>
+  <div id="screenAnnouncement" class="sr-only" aria-live="polite"></div>
   <!-- Google Tag Manager (noscript) -->
   <noscript>
     <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5T9LN9GZ"
@@ -83,8 +88,12 @@
     <section class="app" aria-live="polite">
       <header class="topbar">
         <div class="brand">AGROPEC BRASIL</div>
-        <div class="prize">🎁 Finalize e concorra a uma pistola profissional</div>
+        <div class="prize">🎁 Finalize e participe do sorteio da pistola</div>
       </header>
+  <button class="mobile-sticky-cta" id="mobileStickyStart" type="button">
+    COMEÇAR CHECK-UP GRATUITO
+  </button>
+
 
       <div class="progress-wrap">
         <div class="progress-bar" id="progressBar"></div>
@@ -113,7 +122,13 @@
             <div class="benefit"><span>✓</span> Concorra a uma pistola de aplicação</div>
           </div>
 
-          <button class="btn btn-primary" type="button" id="startBtn">
+          
+          <div class="trust-strip">
+            <span>🔒 Dados protegidos</span>
+            <span>⏱️ Menos de 2 minutos</span>
+            <span>🐂 Exclusivo para pecuaristas</span>
+          </div>
+<button class="btn btn-primary" type="button" id="startBtn">
             COMEÇAR MEU CHECK-UP
           </button>
 
@@ -373,6 +388,7 @@
             <div class="diagnostic-grid" id="diagnosticGrid"></div>
             <div class="result-list" id="resultList"></div>
 
+            <div class="result-action-text" id="resultActionText"></div>
             <div class="result-highlight">
               <strong>Próximo passo recomendado</strong>
               Converse com um especialista para validar o cenário e montar uma estratégia compatível com o manejo da sua fazenda.

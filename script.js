@@ -1,3 +1,73 @@
+
+
+// =========================
+// V5 — CONVERSÃO E UX
+// =========================
+
+function atualizarCtaMobile_() {
+  const cta = document.getElementById("mobileStickyStart");
+  if (!cta) return;
+
+  const intro = document.querySelector('[data-screen="intro"]');
+  const introAtiva = intro && intro.classList.contains("active");
+
+  cta.classList.toggle("visible", Boolean(introAtiva));
+}
+
+function anunciarTelaAtual_() {
+  const live = document.getElementById("screenAnnouncement");
+  const active = getActiveScreen();
+
+  if (!live || !active) return;
+
+  const title = active.querySelector("h1, h2, h3");
+  live.textContent = title
+    ? title.textContent.trim()
+    : "Nova etapa do check-up";
+}
+
+function rolarParaTopoDoFormulario_() {
+  const app = document.querySelector(".app, main, .container");
+  const target = app || document.body;
+
+  window.scrollTo({
+    top: Math.max(target.getBoundingClientRect().top + window.scrollY - 12, 0),
+    behavior: "smooth"
+  });
+}
+
+function montarTextoDeAcaoResultado_(payload) {
+  const el = document.getElementById("resultActionText");
+  if (!el) return;
+
+  const urgencia = String(answers.urgencia || "").toLowerCase();
+  const foco = answers.principal_dor || "os objetivos informados";
+
+  let inicio = "Seu check-up identificou oportunidades relacionadas a ";
+  let complemento = "Uma conversa técnica ajuda a priorizar os próximos passos.";
+
+  if (
+    urgencia.includes("semana") ||
+    urgencia.includes("imediat") ||
+    urgencia.includes("próximos dias")
+  ) {
+    complemento =
+      "Como você indicou maior urgência, recomendamos conversar com um especialista o quanto antes.";
+  }
+
+  el.textContent = `${inicio}${foco}. ${complemento}`;
+}
+
+const mobileStickyStart = document.getElementById("mobileStickyStart");
+
+if (mobileStickyStart) {
+  mobileStickyStart.addEventListener("click", () => {
+    const start = document.getElementById("startBtn");
+    if (start) start.click();
+  });
+}
+
+
 const TRACKING_CONFIG = {
   gtmId: "GTM-5T9LN9GZ",
   ga4Id: "G-1SERKV0FT1",
@@ -162,6 +232,12 @@ function saveProgress() {
     let currentScreenIndex = 0;
 
     function showScreen(target) {
+  window.setTimeout(() => {
+    atualizarCtaMobile_();
+    anunciarTelaAtual_();
+    rolarParaTopoDoFormulario_();
+  }, 20);
+
       screens.forEach(screen => screen.classList.remove("active"));
       target.classList.add("active");
       currentScreenIndex = screens.indexOf(target);
@@ -793,3 +869,38 @@ function saveProgress() {
 
       event.target.value = value;
     });
+
+
+document.addEventListener("keydown", event => {
+  if (event.key !== "Enter") return;
+
+  const active = getActiveScreen();
+  if (!active) return;
+
+  const focused = document.activeElement;
+
+  if (focused && focused.classList.contains("option")) {
+    focused.click();
+    return;
+  }
+
+  if (
+    focused &&
+    ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(focused.tagName)
+  ) {
+    return;
+  }
+
+  const next = active.querySelector(".next-btn, [data-next]");
+  if (next && !next.disabled) next.click();
+});
+
+document.querySelectorAll(".option").forEach(option => {
+  if (!option.hasAttribute("tabindex")) option.setAttribute("tabindex", "0");
+  option.setAttribute("role", "button");
+});
+
+window.addEventListener("load", () => {
+  atualizarCtaMobile_();
+  anunciarTelaAtual_();
+});
