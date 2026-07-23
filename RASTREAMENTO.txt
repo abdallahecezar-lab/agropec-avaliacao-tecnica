@@ -1,0 +1,10 @@
+GTM: GTM-5T9LN9GZ
+GA4: G-1SERKV0FT1
+META PIXEL: 879957080484866
+
+Eventos principais:
+PageView, ViewContent, BeginCheckup, Progress25, Progress50,
+Progress75, CompleteRegistration, Lead, HighScoreLead e Contact.
+
+Atenção: GA4 e Meta Pixel estão instalados diretamente na página.
+Não repita essas tags-base no GTM para evitar duplicidade.
