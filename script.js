@@ -1,4 +1,4 @@
-const CONFIG={webAppUrl: "https://script.google.com/macros/s/AKfycbw9XefO70CjIxVh7g9wAmJKprab5YMds80zWdtVNNaqLF9bZBcwRZZMDrTUq7LsCzlw/exec",storageKey:"agropec_ebook_v2"};
+const CONFIG={webAppUrl: "https://script.google.com/macros/s/AKfycbxAqDrnMji9a0X2y5aEKbaDuan5qzElhnZokdKeYHjpl4TKcUWZ4WJsw0VC6GpLsSJk/exec",storageKey:"agropec_ebook_v2"};
 const screens=[...document.querySelectorAll('.screen')];const answers={};let current=0;window.dataLayer=window.dataLayer||[];
 function event(name,data={}){dataLayer.push({event:name,...data});if(typeof gtag==='function')gtag('event',name,data);if(typeof fbq==='function'){const standard={ebook_lead:'Lead',whatsapp_open:'Contact'}[name];standard?fbq('track',standard,data):fbq('trackCustom',name,data)}}
 function show(i){current=Math.max(0,Math.min(i,screens.length-1));screens.forEach((s,n)=>s.classList.toggle('active',n===current));const pct=current===0?0:Math.min(100,Math.round((current/6)*100));document.getElementById('progressBar').style.width=pct+'%';window.scrollTo({top:0,behavior:'smooth'});if(current>0&&current<7)event('ebook_step_view',{step:current})}
