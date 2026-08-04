@@ -38,24 +38,7 @@ function rolarParaTopoDoFormulario_() {
 
 function montarTextoDeAcaoResultado_(payload) {
   const el = document.getElementById("resultActionText");
-  if (!el) return;
-
-  const urgencia = String(answers.urgencia || "").toLowerCase();
-  const foco = answers.principal_dor || "os objetivos informados";
-
-  let inicio = "Seu check-up identificou oportunidades relacionadas a ";
-  let complemento = "Uma conversa técnica ajuda a priorizar os próximos passos.";
-
-  if (
-    urgencia.includes("semana") ||
-    urgencia.includes("imediat") ||
-    urgencia.includes("próximos dias")
-  ) {
-    complemento =
-      "Como você indicou maior urgência, recomendamos conversar com um especialista o quanto antes.";
-  }
-
-  el.textContent = `${inicio}${foco}. ${complemento}`;
+  if (el) el.textContent = "Clique no botão abaixo para solicitar o Guia Técnico gratuitamente pelo WhatsApp.";
 }
 
 const mobileStickyStart = document.getElementById("mobileStickyStart");
@@ -127,6 +110,9 @@ function trackMarketingEvent(eventName, details = {}) {
   pushTrackingEvent(eventName, details);
 
   const ga4Map = {
+    ebook_offer_view: "view_ebook_offer",
+    ebook_form_start: "begin_ebook_form",
+    ebook_lead: "generate_ebook_lead",
     assessment_page_view: "page_view",
     start_assessment: "begin_checkup",
     assessment_step: "checkup_progress",
@@ -137,6 +123,9 @@ function trackMarketingEvent(eventName, details = {}) {
   };
 
   const metaMap = {
+    ebook_offer_view: ["EbookOfferView", true],
+    ebook_form_start: ["BeginEbookForm", true],
+    ebook_lead: ["EbookLead", true],
     assessment_page_view: ["ViewContent", false],
     start_assessment: ["BeginCheckup", true],
     complete_assessment: ["CompleteRegistration", false],
@@ -225,9 +214,12 @@ function saveProgress() {
 
     const answers = {};
 
+    trackMarketingEvent("ebook_offer_view", {
+      offer_name: "guia_sal_proteinado",
+    });
     trackMarketingEvent("assessment_page_view", {
       page_type: "assessment_landing",
-      assessment_name: "avaliacao_tecnica_rebanho"
+      assessment_name: "ebook_sal_proteinado"
     });
     let currentScreenIndex = 0;
 
@@ -294,8 +286,9 @@ function saveProgress() {
 
     document.getElementById("startBtn").addEventListener("click", () => {
       assessmentStartedAt = Date.now();
+      trackMarketingEvent("ebook_form_start", { offer_name: "guia_sal_proteinado" });
       trackMarketingEvent("start_assessment", {
-        assessment_name: "avaliacao_tecnica_rebanho"
+        assessment_name: "ebook_sal_proteinado"
       });
       showScreen(questionScreens[0]);
       saveProgress();
@@ -351,7 +344,7 @@ function saveProgress() {
             sessionStorage.setItem(`checkup_progress_${mark}`, "1");
             pushTrackingEvent(`progress_${mark}`, {
               progress_percent: mark,
-              assessment_name: "avaliacao_tecnica_rebanho"
+              assessment_name: "ebook_sal_proteinado"
             });
             sendGa4Event(`progress_${mark}`, {
               progress_percent: mark
@@ -389,63 +382,16 @@ function saveProgress() {
     }
 
     function calculateScoreDetails() {
+      const herdScores = {"Até 30":8,"31 a 100":18,"101 a 300":28,"301 a 800":35,"Mais de 800":40};
+      const objectiveScores = {"Ganho de peso":20,"Carrapatos":16,"Vermes":16,"Saúde geral":14,"Todos":20};
+      const productScores = {"Produtos de cocho":12,"Produtos injetáveis":15,"Produtos para passar no gado":12,"Todas as opções":20,"Nenhuma opção":5};
       const breakdown = {
-        potencial_financeiro: 0,
-        urgencia: 0,
-        decisao_compra: 0,
-        maturidade_manejo: 0,
-        intensidade_problema: 0
+        potencial_financeiro: herdScores[answers.quantidade_animais] || 0,
+        objetivo: objectiveScores[answers.principal_dor] || 0,
+        maturidade_manejo: productScores[answers.produtos_utilizados] || 0,
+        conclusao: 20
       };
-
-      const herdScores = {
-        "Até 30": 5,
-        "31 a 100": 12,
-        "101 a 300": 20,
-        "301 a 800": 28,
-        "Mais de 800": 35
-      };
-
-      const urgencyScores = {
-        "Esta semana": 30,
-        "Próximos 30 dias": 22,
-        "Próximos meses": 10,
-        "Pesquisando": 3
-      };
-
-      const decisionScores = {
-        "Sim": 20,
-        "Divido": 12,
-        "Não": 2
-      };
-
-      const injectableScores = {
-        "Sim, regularmente": 10,
-        "Sim, às vezes": 7,
-        "Não utiliza": 3
-      };
-
-      const problemScores = {
-        "Menos de 30 dias": 2,
-        "1 a 6 meses": 4,
-        "Mais de 6 meses": 5,
-        "Há anos": 5
-      };
-
-      breakdown.potencial_financeiro = herdScores[answers.quantidade_animais] || 0;
-      breakdown.urgencia = urgencyScores[answers.urgencia] || 0;
-      breakdown.decisao_compra = decisionScores[answers.decisor] || 0;
-      breakdown.maturidade_manejo = injectableScores[answers.usa_injetavel] || 0;
-      breakdown.intensidade_problema = problemScores[answers.tempo_problema] || 0;
-
-      const total = Math.min(
-        breakdown.potencial_financeiro +
-        breakdown.urgencia +
-        breakdown.decisao_compra +
-        breakdown.maturidade_manejo +
-        breakdown.intensidade_problema,
-        100
-      );
-
+      const total = Math.min(Object.values(breakdown).reduce((a,b)=>a+b,0),100);
       return { total, breakdown };
     }
 
@@ -504,101 +450,44 @@ function saveProgress() {
     }
 
     function getClientDiagnostic() {
-      const pain = answers.principal_dor;
-      const duration = answers.tempo_problema;
-      const purpose = answers.finalidade;
-
-      let attention = "Atenção ao equilíbrio entre manejo sanitário, nutrição e acompanhamento do desempenho.";
-      let recommendation = "Recomendamos revisar o protocolo atual do rebanho com orientação técnica adequada.";
-
-      if (pain === "Ganho de peso") {
-        attention = "O ganho de peso pode estar sendo limitado por nutrição, carga parasitária, manejo ou baixa eficiência do protocolo atual.";
-        recommendation = "Vale revisar o controle de parasitas, a suplementação e a estratégia usada para melhorar o desempenho dos animais.";
-      } else if (pain === "Carrapatos") {
-        attention = "A presença recorrente de carrapatos pode comprometer o bem-estar, o desempenho e a produtividade do rebanho.";
-        recommendation = "É importante revisar a frequência de controle, o princípio ativo utilizado e a possibilidade de resistência parasitária.";
-      } else if (pain === "Vermes") {
-        attention = "A verminose pode reduzir o aproveitamento dos nutrientes e prejudicar o desenvolvimento dos animais.";
-        recommendation = "Recomenda-se avaliar o protocolo de vermifugação, a frequência de aplicação e o histórico de resposta do rebanho.";
-      } else if (pain === "Todos") {
-        attention = "Suas respostas indicam que desempenho e controle parasitário precisam ser avaliados em conjunto.";
-        recommendation = "Uma estratégia integrada de manejo sanitário e suporte ao ganho de peso tende a ser mais adequada ao seu caso.";
-      } else if (purpose === "Gado leiteiro") {
-        attention = "Em rebanhos leiteiros, o manejo sanitário precisa considerar produtividade, condição corporal e segurança do protocolo utilizado.";
-        recommendation = "É importante adotar soluções compatíveis com a atividade leiteira e seguir corretamente as orientações de uso e carência.";
-      }
-
-      let durationNote = "O desafio informado merece acompanhamento para evitar perdas acumuladas.";
-      if (duration === "Há anos" || duration === "Mais de 6 meses") {
-        durationNote = "Como esse desafio já acontece há bastante tempo, pode ser necessário rever o protocolo utilizado e investigar por que os resultados atuais não estão sendo suficientes.";
-      } else if (duration === "Menos de 30 dias") {
-        durationNote = "Como o problema foi percebido recentemente, agir cedo pode ajudar a evitar que ele se agrave ou gere perdas maiores.";
-      }
-
-      return { attention, recommendation, durationNote };
+      return {
+        attention: `Principal interesse informado: ${answers.principal_dor}.`,
+        recommendation: "O Guia Técnico será disponibilizado pelo WhatsApp.",
+        durationNote: `Manejo atual: ${answers.produtos_utilizados}.`
+      };
     }
 
     function buildWhatsAppMessage(data) {
       const message = [
-        "[AVALIACAO_REBANHO]",
-        "",
-        "Olá! Concluí a Check-up Gratuito do Rebanho e gostaria de falar com um especialista da Agropec Brasil.",
+        "[EBOOK_SAL_PROTEINADO]",
+        "Olá! Concluí o cadastro e quero receber gratuitamente o Guia Técnico de Sal Proteinado.",
         "",
         `*Nome:* ${data.nome}`,
-        `*WhatsApp:* ${data.whatsapp}`,
         `*Cidade/UF:* ${data.cidade} - ${data.estado}`,
         `*Rebanho:* ${answers.quantidade_animais} bovinos`,
         `*Atividade:* ${answers.finalidade}`,
-        `*Principal objetivo:* ${answers.principal_dor}`,
-        `*Tempo do desafio:* ${answers.tempo_problema}`,
-        `*Usa produtos injetáveis:* ${answers.usa_injetavel}`,
-        `*Urgência:* ${answers.urgencia}`,
-        `*Participa da decisão de compra:* ${answers.decisor}`,
-        `*Orientação inicial:* ${data.linha_recomendada}`,
-        "",
-        "Gostaria de receber uma orientação para o meu rebanho."
+        `*Objetivo:* ${answers.principal_dor}`,
+        `*Produtos usados:* ${answers.produtos_utilizados}`
       ].join("\n");
-
       return `https://wa.me/${WHATSAPP_CENTRAL}?text=${encodeURIComponent(message)}`;
     }
 
     function buildInternalCommercialSummary(data) {
       return [
-        "FICHA DA AVALIAÇÃO TÉCNICA",
+        "LEAD — EBOOK SAL PROTEINADO",
         "",
         `Nome: ${data.nome}`,
-        `Cidade/UF: ${data.cidade} - ${data.estado}`,
         `WhatsApp: ${data.whatsapp}`,
-        `Rebanho: ${answers.quantidade_animais} bovinos`,
+        `Cidade/UF: ${data.cidade} - ${data.estado}`,
+        `Rebanho: ${answers.quantidade_animais}`,
         `Atividade: ${answers.finalidade}`,
-        `Principal objetivo: ${answers.principal_dor}`,
-        `Tempo do desafio: ${answers.tempo_problema}`,
-        `Urgência: ${answers.urgencia}`,
-        `Usa injetáveis: ${answers.usa_injetavel}`,
-        `Decisor: ${answers.decisor}`,
-        "",
-        `Classificação interna: ${data.classificacao}`,
-        `Score geral: ${data.score}/100`,
-        `Potencial financeiro: ${data.score_potencial_financeiro}`,
-        `Urgência: ${data.score_urgencia}`,
-        `Poder de decisão: ${data.score_decisao_compra}`,
-        `Maturidade de manejo: ${data.score_maturidade_manejo}`,
-        `Intensidade do problema: ${data.score_intensidade_problema}`,
-        "",
-        `Linha recomendada: ${data.linha_recomendada}`,
-        `Produtos sugeridos: ${data.produtos_recomendados}`,
-        `Abordagem sugerida: ${data.abordagem_sugerida}`,
-        `Prioridade: ${data.prioridade_contato}`,
-        "Origem: Avaliação Técnica do Rebanho"
+        `Objetivo: ${answers.principal_dor}`,
+        `Produtos utilizados: ${answers.produtos_utilizados}`,
+        `Score: ${data.score}/100`,
+        `Classificação: ${data.classificacao}`,
+        `Produtos sugeridos: ${data.produtos_recomendados}`
       ].join("\n");
     }
-
-    function updateWhatsAppButton(data) {
-      const button = document.getElementById("whatsappSpecialistBtn");
-      if (!button) return;
-      button.href = buildWhatsAppMessage(data);
-    }
-
 
     function executarAnimacaoAnalise_() {
       const passos = Array.from(
@@ -646,8 +535,8 @@ function saveProgress() {
           texto: answers.principal_dor || "Não informado"
         },
         {
-          titulo: "⏳ Prioridade",
-          texto: answers.urgencia || "Não informada"
+          titulo: "📦 Manejo atual",
+          texto: answers.produtos_utilizados || "Não informado"
         },
         {
           titulo: "💡 Linha de atenção",
@@ -664,20 +553,15 @@ function saveProgress() {
     }
 
     function renderResult(data) {
-      const diagnostic = getClientDiagnostic();
-
       document.getElementById("resultSummary").textContent =
-        `Com base nas informações fornecidas, identificamos um ponto de atenção relacionado a ${answers.principal_dor.toLowerCase()}.`;
-
-      const resultList = document.getElementById("resultList");
-      resultList.innerHTML = `
-        <div><strong>🐄 Perfil informado:</strong> ${answers.quantidade_animais} bovinos — ${answers.finalidade}</div>
-        <div><strong>⚠️ Ponto de atenção:</strong> ${diagnostic.attention}</div>
-        <div><strong>🔎 Análise:</strong> ${diagnostic.durationNote}</div>
-        <div><strong>💡 Orientação inicial:</strong> ${diagnostic.recommendation}</div>
-        <div><strong>📞 Próximo passo:</strong> Nossa equipe poderá conversar com você para entender melhor o manejo atual e indicar opções compatíveis com o seu rebanho.</div>
+        "Seu cadastro foi concluído. O Guia Técnico de Sal Proteinado já pode ser solicitado pelo WhatsApp.";
+      document.getElementById("resultList").innerHTML = `
+        <div><strong>📘 Material:</strong> Guia Técnico 001 — Sal Proteinado para Bovinos</div>
+        <div><strong>🐄 Seu rebanho:</strong> ${answers.quantidade_animais} — ${answers.finalidade}</div>
+        <div><strong>🎯 Principal objetivo:</strong> ${answers.principal_dor}</div>
+        <div><strong>📦 Manejo informado:</strong> ${answers.produtos_utilizados}</div>
       `;
-
+      montarCardsDiagnostico_(data);
       updateWhatsAppButton(data);
     }
 
@@ -770,14 +654,14 @@ function saveProgress() {
         score,
         classificacao,
         score_potencial_financeiro: scoreDetails.breakdown.potencial_financeiro,
-        score_urgencia: scoreDetails.breakdown.urgencia,
-        score_decisao_compra: scoreDetails.breakdown.decisao_compra,
+        score_objetivo: scoreDetails.breakdown.objetivo,
+        score_conclusao: scoreDetails.breakdown.conclusao,
         score_maturidade_manejo: scoreDetails.breakdown.maturidade_manejo,
-        score_intensidade_problema: scoreDetails.breakdown.intensidade_problema,
+        
         linha_recomendada,
         produtos_recomendados,
         abordagem_sugerida,
-        origem_lead: "Avaliação Técnica do Rebanho",
+        origem_lead: "Ebook Sal Proteinado",
         prioridade_contato:
           classificacao.includes("muito quente") ? "Contato imediato" :
           classificacao.includes("quente") ? "Contato no mesmo dia" :
@@ -805,20 +689,21 @@ function saveProgress() {
         setTimeout(() => {
           renderResult(payload);
           showScreen(document.querySelector('[data-screen="result"]'));
-          submitButton.textContent = "AVALIAÇÃO REGISTRADA";
+          submitButton.textContent = "EBOOK LIBERADO";
 
           trackMarketingEvent("complete_assessment", {
-            assessment_name: "avaliacao_tecnica_rebanho",
+            assessment_name: "ebook_sal_proteinado",
             lead_score: payload.score,
             lead_classification: payload.classificacao,
             herd_size: answers.quantidade_animais,
             production_type: answers.finalidade,
             main_goal: answers.principal_dor,
-            urgency: answers.urgencia
+            products_used: answers.produtos_utilizados
           });
 
+          trackMarketingEvent("ebook_lead", { offer_name: "guia_sal_proteinado", lead_score: payload.score });
           trackMarketingEvent("generate_lead", {
-            lead_source: "avaliacao_tecnica_rebanho",
+            lead_source: "ebook_sal_proteinado",
             lead_score: payload.score,
             lead_classification: payload.classificacao
           });
@@ -829,7 +714,7 @@ function saveProgress() {
               lead_classification: payload.classificacao,
               herd_size: answers.quantidade_animais,
               main_goal: answers.principal_dor,
-              urgency: answers.urgencia
+              products_used: answers.produtos_utilizados
             });
           }
 
@@ -839,7 +724,7 @@ function saveProgress() {
         console.error(err);
         alert(err.message || "Ocorreu um erro ao registrar sua avaliação. Tente novamente.");
         submitButton.disabled = false;
-        submitButton.textContent = "VER MEU RESULTADO";
+        submitButton.textContent = "RECEBER MEU EBOOK GRÁTIS";
         showScreen(document.querySelector('[data-screen="contact"]'));
       }
     });
