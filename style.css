@@ -896,3 +896,269 @@ select:focus-visible,
 .ebook-time{text-align:center;font-size:13px;color:#66766e;margin:10px 0 0}.ebook-visual{position:relative;min-height:430px;display:grid;place-items:center;overflow:hidden;border-radius:24px;background:#e8f0e9}.ebook-visual>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.55) saturate(.9)}
 .book-cover{position:relative;z-index:2;width:250px;min-height:340px;padding:30px 25px;border-radius:8px 18px 18px 8px;background:linear-gradient(145deg,#123f2b,#0a251a);box-shadow:20px 24px 40px rgba(0,0,0,.35);color:white;transform:rotate(-4deg);border-left:10px solid #d7ae3d;display:flex;flex-direction:column}.book-cover:after{content:"";position:absolute;right:-9px;top:10px;bottom:10px;width:12px;border-radius:0 8px 8px 0;background:#f3ead2}.book-tag{font-size:12px;font-weight:900;color:#f1ce64;letter-spacing:1px}.book-cover strong{font-size:42px;line-height:.95;margin:45px 0 20px}.book-cover small{line-height:1.45;color:#dfece4}.book-brand{margin-top:auto;font-weight:900;border-top:1px solid rgba(255,255,255,.2);padding-top:15px}
 @media(max-width:760px){.ebook-hero{grid-template-columns:1fr;text-align:center}.ebook-copy h1{font-size:38px}.ebook-copy .intro-lead{font-size:17px}.ebook-points{justify-content:center}.ebook-visual{min-height:330px;order:-1}.book-cover{width:190px;min-height:265px;padding:22px}.book-cover strong{font-size:32px;margin:30px 0 15px}}
+
+
+/* =========================================================
+   V2 MOBILE — PRIMEIRA DOBRA CURTA E CTA VISÍVEL
+   ========================================================= */
+
+.ebook-hero-v2 {
+  display: block;
+  text-align: left;
+}
+
+.ebook-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 235px;
+  align-items: center;
+  gap: 28px;
+}
+
+.ebook-title-area h1 {
+  margin-bottom: 0;
+}
+
+.ebook-visual-v2 {
+  min-height: 320px;
+  border-radius: 22px;
+  overflow: visible;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(218,169,45,.18), transparent 42%),
+    linear-gradient(145deg, #eef6f0, #dce9df);
+}
+
+.ebook-visual-v2::after {
+  content: "";
+  position: absolute;
+  width: 78%;
+  height: 22px;
+  left: 11%;
+  bottom: 18px;
+  border-radius: 50%;
+  background: rgba(8,45,29,.18);
+  filter: blur(10px);
+}
+
+.ebook-visual-v2 > img {
+  display: none !important;
+}
+
+.book-cover-v2 {
+  width: 190px;
+  min-height: 262px;
+  padding: 23px 20px;
+  transform: rotate(-3deg);
+  box-shadow: 14px 19px 30px rgba(8,45,29,.28);
+}
+
+.book-cover-v2 strong {
+  margin: 31px 0 14px;
+  font-size: 32px;
+}
+
+.book-cover-v2 small {
+  font-size: 13px;
+}
+
+.hero-main-cta {
+  width: 100%;
+  max-width: 460px;
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+.ebook-points {
+  margin: 14px 0 16px;
+}
+
+.ebook-time {
+  max-width: 460px;
+}
+
+.mobile-sticky-cta {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .page {
+    display: block;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .app {
+    min-height: 100vh;
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .topbar {
+    min-height: 62px;
+    padding: 10px 16px;
+  }
+
+  .brand {
+    font-size: 14px;
+  }
+
+  .brand::before {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+
+  .prize {
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+
+  .progress-wrap {
+    height: 5px;
+  }
+
+  .content {
+    padding: 20px 18px 24px;
+  }
+
+  .screen {
+    max-width: none;
+  }
+
+  .ebook-head {
+    grid-template-columns: minmax(0, 1fr) 108px;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .ebook-title-area .eyebrow {
+    padding: 6px 9px;
+    margin-bottom: 10px;
+    font-size: 9px;
+    letter-spacing: .15px;
+  }
+
+  .ebook-title-area h1 {
+    font-size: clamp(29px, 8.3vw, 36px);
+    line-height: 1.01;
+    letter-spacing: -.045em;
+  }
+
+  .ebook-visual-v2 {
+    min-height: 168px;
+    height: 168px;
+    border-radius: 16px;
+  }
+
+  .book-cover-v2 {
+    width: 94px;
+    min-height: 142px;
+    padding: 13px 10px;
+    border-left-width: 5px;
+    border-radius: 5px 11px 11px 5px;
+    box-shadow: 8px 10px 18px rgba(8,45,29,.27);
+  }
+
+  .book-cover-v2::after {
+    right: -5px;
+    width: 7px;
+  }
+
+  .book-cover-v2 .book-tag {
+    font-size: 7px;
+    letter-spacing: .5px;
+  }
+
+  .book-cover-v2 strong {
+    margin: 18px 0 8px;
+    font-size: 17px;
+    line-height: .95;
+  }
+
+  .book-cover-v2 small {
+    font-size: 7.5px;
+    line-height: 1.3;
+  }
+
+  .book-cover-v2 .book-brand {
+    padding-top: 7px;
+    font-size: 8px;
+  }
+
+  .intro-lead {
+    margin: 13px 0 0;
+    font-size: 15px !important;
+    line-height: 1.42;
+  }
+
+  .ebook-points {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 7px;
+    margin: 12px 0 13px;
+  }
+
+  .ebook-points span {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+
+  .hero-main-cta {
+    min-height: 56px;
+    max-width: none;
+    padding: 14px 12px;
+    margin-top: 0;
+    font-size: 14px;
+    border-radius: 13px;
+  }
+
+  .ebook-time {
+    margin: 8px 0 0;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .trust-strip {
+    display: flex;
+    justify-content: center;
+    gap: 8px 12px;
+    max-width: none;
+    margin: 12px 0 0;
+    font-size: 10px;
+  }
+
+  .trust-strip span:nth-child(3) {
+    display: none;
+  }
+
+  #resumeBtn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 365px) {
+  .ebook-head {
+    grid-template-columns: minmax(0, 1fr) 92px;
+    gap: 9px;
+  }
+
+  .ebook-title-area h1 {
+    font-size: 27px;
+  }
+
+  .ebook-visual-v2 {
+    height: 150px;
+    min-height: 150px;
+  }
+
+  .book-cover-v2 {
+    width: 82px;
+    min-height: 126px;
+  }
+
+  .intro-lead {
+    font-size: 14px !important;
+  }
+}

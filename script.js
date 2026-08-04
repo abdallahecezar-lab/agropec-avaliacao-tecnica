@@ -41,15 +41,6 @@ function montarTextoDeAcaoResultado_(payload) {
   if (el) el.textContent = "Clique no botão abaixo para solicitar o Guia Técnico gratuitamente pelo WhatsApp.";
 }
 
-const mobileStickyStart = document.getElementById("mobileStickyStart");
-
-if (mobileStickyStart) {
-  mobileStickyStart.addEventListener("click", () => {
-    const start = document.getElementById("startBtn");
-    if (start) start.click();
-  });
-}
-
 
 const TRACKING_CONFIG = {
   gtmId: "GTM-5T9LN9GZ",
